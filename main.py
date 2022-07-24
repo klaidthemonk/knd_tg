@@ -14,9 +14,13 @@ def game():
         while knight.hp > 0:
             whats_next(knight)
         print(f'{knight.name} мёртв!')
-        print(f'{knight.name} в своих приключениях убил {knight.frags} драконов и заработал {knight.treasure} монет.')
-        print(f'{knight.name} навсегда останется лежать на кладбище.')
-        mourning(knight)
+        if knight.frags > 0:
+            print(f'{knight.name} в своих приключениях убил {knight.frags} драконов и заработал {knight.treasure} монет.')
+            print(f'{knight.name} навсегда останется лежать на кладбище.')
+            mourning(knight)
+        else:
+            print(f'{knight.name} оказался слабаком и не убил ни одного дракона.')
+            print(f'{knight.name} будет забыт всеми.')
         print('Введите что угодно чтобы начать заново')
         again = input('Q чтобы закончить игру ')
         if again == 'Q':
@@ -24,14 +28,14 @@ def game():
 
 
 def mourning(knight):
-    cemetary_file = codecs.open('cemetary.txt', 'a', 'utf-8')
+    cemetary_file = codecs.open('cemetary.txt', 'a+', 'utf-8')
     headstone = f'{knight.name}, {knight.treasure}\n'
     cemetary_file.writelines(headstone)
     cemetary_file.close()
 
 
 def cemetary(knight):
-    cemetary_file = codecs.open('cemetary.txt', 'r', 'utf-8')
+    cemetary_file = codecs.open('cemetary.txt', 'r+', 'utf-8')
     dead_knights = cemetary_file.readlines()
 
     if len(dead_knights) == 0:
@@ -51,7 +55,7 @@ def cemetary(knight):
 
         count = int(input('Сколько могил осмотреть? '))
         if count > len(dead_knights):
-            print ('На кладбище нет столько могил.')
+            print('На кладбище нет столько могил.')
         else:
             headstones = []
             for dead_knight in dead_knights:
@@ -62,6 +66,7 @@ def cemetary(knight):
             for headstone in headstones[:count]:
                 print(f'{headstone[0]}, {headstone[1]}')
             cemetary_file.close()
+
 
 def shopping(knight):
     print('Добро пожаловать в магазин!')
