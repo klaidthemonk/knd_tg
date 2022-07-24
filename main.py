@@ -63,6 +63,85 @@ def cemetary(knight):
                 print(f'{headstone[0]}, {headstone[1]}')
             cemetary_file.close()
 
+def shopping(knight):
+    print('Добро пожаловать в магазин!')
+    item = ''
+    while item != 'Q':
+        item = input('Что бы вы хотели купить? ')
+        if item == 'help':
+            print('''Помощь бесплатна!
+heal - полностью вылечиться (1 монета за 1 очко здоровья)
+sword - заточить меч и увеличить атаку на 1 (10 монет)
+health - зелье повышения максимального здоровья на 1 (10 монет)
+shield - купить щит, который спасёт в фатальной ситуации (10 монет)
+spf - солнцезащитный крем 1000 SPF, спасающий от ожогов (10 монет)
+status - заглянуть в кошелёк
+Q чтобы уйти из магазина''')
+
+        elif item == 'heal':
+            if knight.hp == knight.maxhp:  # если рыцарь здоров
+                print(f'{knight.name} уже здоров!')
+            elif knight.gold < knight.maxhp - knight.hp:  # если рыцарю не хватит денег на полное лечение
+                knight.hp += knight.gold
+                knight.gold = 0
+                print(f'Это всё, на что хватит денег. {knight.name} теперь имеет {knight.hp} очков здоровья.')
+            else:
+                knight.gold -= knight.maxhp - knight.hp
+                knight.hp = knight.maxhp
+                print(f'{knight.name} лечится полностью и у него остаётся {knight.gold} монет!')
+
+        elif item == 'sword':
+            if knight.gold < 10:  # 10 - цена заточки меча
+                print(f'{knight.name} имеет всего {knight.gold} монет. Заточка меча стоит 10.')
+            else:
+                knight.gold -= 10
+                knight.damage += 1
+                print(f'{knight.name} заточил свой меч и теперь наносит до {knight.damage} урона!')
+
+        elif item == 'health':
+            if knight.gold < 10:  # 10 - цена зелья здоровья
+                print(f'{knight.name} имеет всего {knight.gold} монет. Зелье здоровья стоит 10.')
+            else:
+                knight.gold -= 10
+                knight.maxhp += 1
+                knight.hp += 1
+                print(f'{knight.name} выпил зелье и теперь его максимальное здоровье -  {knight.maxhp}!')
+
+        elif item == 'shield':
+            if knight.shield == True:
+                print(f'{knight.name} уже носит щит! Второй ему ни к чему.')
+            elif knight.gold < 10:  # 10 - цена щита
+                print(f'{knight.name} имеет всего {knight.gold} монет. Щит стоит 10.')
+            else:
+                knight.gold -= 10
+                knight.shield = True
+                print(f'{knight.name} купил щит!')
+
+        elif item == 'spf':
+            if knight.spf == True:
+                print(f'{knight.name} уже нанёс крем от ожогов.')
+            elif knight.gold < 10:  # 10 - цена солнцезащитного крема
+                print(f'{knight.name} имеет всего {knight.gold} монет. Солнцезащитный крем стоит 10.')
+            else:
+                knight.gold -= 10
+                knight.spf = True
+                print(f'{knight.name} купил крем от ожогов!')
+
+        elif item == 'status':
+            print(f'{knight.name} смотрит в кошелёк. Монет в нём - {knight.gold}.')
+
+        elif item == 'Q':
+            break
+
+        else:
+            print('Такого в продаже нет. Напишите help чтобы узнать, что продаётся.')
+
+
+def get_dragon(knight):
+    dragon_rainbow = ['красный']
+    color = dragon_rainbow[randint(0,len(dragon_rainbow))]
+    return color
+
 
 def whats_next(knight):
     action = input('Что дальше? ')
@@ -71,20 +150,24 @@ def whats_next(knight):
     if action == 'help':
         print('''help - получить список команд
 fight - сразиться с драконом
-heal - вылечить раны
+rest - вылечить раны
+shop - отправиться в магазин
 cemetary - отправиться на кладбище''')
 
-    # /heal to heal hp to max
-    elif action == 'heal':
-        if knight.hp < knight.maxhp:
-            knight.hp = knight.maxhp
-            print(f'{knight.name} залечил свои раны!')
-        else:
-            print(f'{knight.name} уже здоров!')
+    # /rest to heal hp a bit
+    elif action == 'rest':
+        rest = knight.rest()
+        if rest == 'healthy':
+            print(f'{knight.name} здоров!')
+        elif rest == 'rest':
+            print(f'{knight.name} отдыхает и теперь у него {knight.hp} очков здоровья!')
+        elif rest == 'rested':
+            print(f'{knight.name} уже отдыхал сегодня! Пора в бой!')
 
     # fight with dragon to death
     elif action == 'fight':
-        dragon = Dragon()
+        color = get_dragon(knight)
+        dragon = Dragon(color)
         print('Дракон нападает!')
         counter = 1
         while dragon.hp > 0:
@@ -101,8 +184,13 @@ cemetary - отправиться на кладбище''')
             # dragon attacks
             else:
                 damage = randint(0, dragon.damage)
-                if damage == 0:
+                if knight.spf == True:
+                    damage -= 1
+                if damage <= 0:
                     print(f'Ух! {knight.name} уклоняется от дыхания дракона!')
+                elif damage >= knight.hp and knight.shield == True:
+                    knight.shield = False
+                    print(f'Ух! {knight.name} спасается от дыхания дракона за щитом! Щит разваливается на куски.')
                 else:
                     knight.take_damage(damage)
                     if knight.hp > 0:
@@ -119,6 +207,9 @@ cemetary - отправиться на кладбище''')
 
     elif action == 'cemetary':
         cemetary(knight)
+
+    elif action == 'shop':
+        shopping(knight)
 
     else:
         print('Такого действия нет. Напишите help чтобы получить список действий.')

@@ -3,7 +3,8 @@ from random import randint
 
 class Dragon():
 
-	def __init__(self):
+	def __init__(self, color):
+		self.color = color
 		self.maxhp = 40
 		self.hp = self.maxhp
 		self.treasuremax = 10
