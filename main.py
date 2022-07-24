@@ -1,5 +1,5 @@
 import codecs
-from random import randint
+from random import randint, choice
 from dragon import Dragon
 from knight import Knight
 
@@ -139,7 +139,13 @@ Q чтобы уйти из магазина''')
 
 def get_dragon(knight):
     dragon_rainbow = ['красный']
-    color = dragon_rainbow[randint(0,len(dragon_rainbow))]
+    if knight.frags >= 10:
+        dragon_rainbow.extend(['оранжевый', 'желтый', 'зеленый'])
+    if knight.frags >= 20:
+        dragon_rainbow.extend(['голубой', 'синий', 'фиолетовый'])
+    if knight.frags >= 30:
+        dragon_rainbow.append('черный')
+    color = choice(dragon_rainbow)
     return color
 
 
@@ -164,11 +170,15 @@ cemetary - отправиться на кладбище''')
         elif rest == 'rested':
             print(f'{knight.name} уже отдыхал сегодня! Пора в бой!')
 
+    # test cheat
+    elif action == 'cheat':
+        knight.hp += 100
+
     # fight with dragon to death
     elif action == 'fight':
         color = get_dragon(knight)
         dragon = Dragon(color)
-        print('Дракон нападает!')
+        print(f'{dragon.color.capitalize()} дракон нападает!')
         counter = 1
         while dragon.hp > 0:
 

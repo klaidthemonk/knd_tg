@@ -25,7 +25,7 @@ class Knight():
         self.spf = False
 
     def rest(self):
-        if self.hp == self.maxhp:
+        if self.hp >= self.maxhp:
             return 'healthy'
         elif self.rested == False:
             self.hp += randint(1, self.maxhp - self.hp)
